@@ -4,7 +4,8 @@ from rich.console import Console
 from rich.table import Table
 import config
 from main import clear_screen
-from utils.loading import show_loading_message  # ✅ Import loading message
+from utils.loading import show_loading_message
+from utils.aws_error_handler import handle_aws_errors  # ✅ Import global AWS error handler
 
 console = Console()
 
@@ -12,6 +13,7 @@ class ListInstancesPlugin(BasePlugin):
     def __init__(self):
         super().__init__("List Instances", "Compute", "Displays all EC2 instances with their names.")
 
+    @handle_aws_errors  # ✅ Apply global AWS error handling
     def run(self, region=None):
         if region is None:
             region = config.AWS_REGION
@@ -50,7 +52,7 @@ class ListInstancesPlugin(BasePlugin):
                     state_icon = "🟢 Running" if instance["State"]["Name"] == "running" else "🔴 Stopped"
 
                     table.add_row(
-                        f"{name_tag}",  # ✅ Added spacing & a wrench icon for uniqueness
+                        f"{name_tag}",  # ✅ Added spacing for readability
                         instance["InstanceId"],
                         f"[bold]{state_icon}[/bold]",
                         instance["InstanceType"],
